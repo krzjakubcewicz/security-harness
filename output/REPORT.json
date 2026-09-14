@@ -1,0 +1,127 @@
+{
+  "run" : {
+    "startedAt" : "2026-09-14T21:44:01.868606500Z",
+    "finishedAt" : "2026-09-14T21:44:19.972102100Z",
+    "vulnerabilitiesFile" : "/homework/findings/findings.json",
+    "reposRoot" : "/homework/services",
+    "exitCode" : 1,
+    "abort" : null
+  },
+  "summary" : {
+    "total" : 3,
+    "success" : 2,
+    "needsAttention" : 1,
+    "notProcessed" : 0
+  },
+  "services" : [ {
+    "service" : "inventory-api",
+    "directory" : "/homework/services/inventory-api",
+    "endState" : "SUCCESS",
+    "buildGate" : {
+      "action" : "ALLOW",
+      "stacks" : [ "java" ],
+      "steps" : [ {
+        "name" : "compile",
+        "passed" : true,
+        "exitCode" : 0
+      }, {
+        "name" : "test",
+        "passed" : true,
+        "exitCode" : 0
+      } ]
+    },
+    "autonomy" : {
+      "rule" : "escalate-major-version-changes",
+      "action" : "JIRA",
+      "finding" : "F-40218",
+      "reason" : "F-40218 org.yaml:snakeyaml 1.30 -> 2.0 (MAJOR, DEPENDENCY_FILE_ONLY)",
+      "warning" : null
+    },
+    "findings" : [ {
+      "id" : "F-40218",
+      "cve" : "CVE-2022-1471",
+      "severity" : "CRITICAL",
+      "packageName" : "org.yaml:snakeyaml",
+      "installedVersion" : "1.30",
+      "fixedVersion" : "2.0",
+      "strategy" : "AGENT_REMEDIATION",
+      "escalated" : false,
+      "attempts" : 1,
+      "verified" : true,
+      "guardDecisions" : [ {
+        "phase" : "BEFORE",
+        "rule" : null,
+        "action" : "ALLOW"
+      }, {
+        "phase" : "AFTER",
+        "rule" : null,
+        "action" : "ALLOW"
+      } ],
+      "filesChanged" : [ "pom.xml" ],
+      "testsBefore" : null,
+      "testsAfter" : null,
+      "outcome" : "SUCCESS"
+    }, {
+      "id" : "F-40220",
+      "cve" : "CVE-2015-6420",
+      "severity" : "HIGH",
+      "packageName" : "commons-collections:commons-collections",
+      "installedVersion" : "3.2.1",
+      "fixedVersion" : null,
+      "strategy" : "DEPENDENCY_UPDATE",
+      "escalated" : false,
+      "attempts" : 0,
+      "verified" : false,
+      "guardDecisions" : [ ],
+      "filesChanged" : [ ],
+      "testsBefore" : null,
+      "testsAfter" : null,
+      "outcome" : "NEEDS_ATTENTION"
+    } ]
+  }, {
+    "service" : "report-worker",
+    "directory" : "/homework/services/report-worker",
+    "endState" : "SUCCESS",
+    "buildGate" : {
+      "action" : "ALLOW",
+      "stacks" : [ "python" ],
+      "steps" : [ {
+        "name" : "install",
+        "passed" : true,
+        "exitCode" : 0
+      }, {
+        "name" : "compile",
+        "passed" : true,
+        "exitCode" : 0
+      }, {
+        "name" : "test",
+        "passed" : true,
+        "exitCode" : 0
+      } ]
+    },
+    "autonomy" : {
+      "rule" : "auto-merge-green-dependency-bumps",
+      "action" : "AUTO_MERGE",
+      "finding" : "F-40219",
+      "reason" : "F-40219 PyYAML 5.3.1 -> 5.4 (MINOR, DEPENDENCY_FILE_ONLY)",
+      "warning" : null
+    },
+    "findings" : [ {
+      "id" : "F-40219",
+      "cve" : "CVE-2020-14343",
+      "severity" : "HIGH",
+      "packageName" : "PyYAML",
+      "installedVersion" : "5.3.1",
+      "fixedVersion" : "5.4",
+      "strategy" : "DEPENDENCY_UPDATE",
+      "escalated" : false,
+      "attempts" : 1,
+      "verified" : true,
+      "guardDecisions" : [ ],
+      "filesChanged" : [ "requirements.lock" ],
+      "testsBefore" : null,
+      "testsAfter" : null,
+      "outcome" : "SUCCESS"
+    } ]
+  } ]
+}

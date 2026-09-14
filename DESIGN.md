@@ -51,3 +51,6 @@ Major updates to framework-related dependencies require a Jira ticket. A pull re
 
 ### Small Code Changes
 For a given service, small code changes may be handled automatically when they do not affect critical parts of the application. This depends on the quality of testing for the affected packages, E2E test coverage, and how frequently regression testing is performed.
+
+## Scaling
+As an initial step in scaling the solution from 2 to 300 services, the harness should be run separately for each service repository. The target architecture should use containerized harness executions per service, orchestrated through workflows managed by a system such as n8n.
