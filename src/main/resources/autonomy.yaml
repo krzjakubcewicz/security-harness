@@ -1,0 +1,73 @@
+# What happens to the changes a run produced. Rules are evaluated top-to-bottom for every finding
+# in a service; the first rule a finding trips decides that finding, and the strictest answer
+# across the service decides the service - one working tree becomes one branch, so the most
+# cautious finding sets the terms.
+#
+# A finding that trips NO rule defaults to pull_request. Note this is the opposite of guards.yaml,
+# where no match means ALLOW: a change nobody anticipated is exactly the change worth reading.
+# An empty list here turns the feature off entirely - no decision, no log line, no report field.
+#
+# Match fields: versionChange (major|minor|patch|none|unknown), changeKind (dependency_file_only|
+# source_code|none), buildGate (allow|block|manual_review), severity, packageName, service,
+# outcome. Actions: auto_merge, pull_request, slack, jira, none.
+#
+# Every field matches a whole value, case-insensitively. packageName is the exception: a '*' in it
+# stands for any run of characters, so one rule covers a coordinate group. No other field globs,
+# and neither does guards.yaml - a name without a '*' is still the exact name it reads as.
+#
+# A rule with no 'match:' block matches every finding - never write one with action: auto_merge.
+gates:
+
+  # First, and above the auto-merge rule on purpose. A finding a human still has to read is not a
+  # candidate for merging itself, whatever its version delta or changeKind says - and a green build
+  # proves nothing when the agent may have removed or disabled the tests that would have gone red.
+  # It is still a pull request: this harness runs as a pipeline step and the pull request is what
+  # the pipeline produces. What makes this one different is the warning the decision carries onto
+  # it.
+  - name: a-finding-a-human-must-read
+    match:
+      outcome: needs_attention
+    action: pull_request
+
+  # Then, because a major jump is a conversation, not a diff - even when it only renumbers one
+  # line of pom.xml. No pull request is opened for it at all.
+  - name: escalate-major-version-changes
+    match:
+      versionChange: major
+    action: jira
+
+  # A red build is worth saying out loud: nobody is going to notice a pull request that cannot
+  # merge, and the harness already knows the tests failed.
+  - name: tell-the-channel-when-the-build-gate-blocked
+    match:
+      buildGate: block
+    action: slack
+
+  # Above the auto-merge rule, below the two escalations: a spring bump is read by a person, but a
+  # MAJOR one is still a ticket and a red build is still worth saying out loud. The '*' covers
+  # org.springframework.boot and the rest of the family, which move together with the core.
+  - name: review-spring-updates
+    match:
+      packageName: org.springframework*
+    action: pull_request
+
+  # The one case the harness is trusted with unattended: a small version move, in the file the
+  # stack declares versions in, with the build green.
+  - name: auto-merge-green-dependency-bumps
+    match:
+      versionChange: [minor, patch]
+      changeKind: dependency_file_only
+      buildGate: allow
+    action: auto_merge
+
+  # Anything that edited code is read by a person, whatever the version numbers say.
+  - name: review-anything-that-touched-source
+    match:
+      changeKind: source_code
+    action: pull_request
+
+  # Nothing was written, so there is nothing to ship and nobody to tell.
+  - name: nothing-changed-nothing-to-ship
+    match:
+      changeKind: none
+    action: none

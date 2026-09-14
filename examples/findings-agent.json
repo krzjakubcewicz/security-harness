@@ -1,0 +1,30 @@
+{
+  "generated": "2026-08-03T02:14:07Z",
+  "scanner": "internal-composition-scan",
+  "findings": [
+    {
+      "id": "F-40218",
+      "cve": "CVE-2022-1471",
+      "severity": "high",
+      "service": "inventory-api",
+      "package": "org.yaml:snakeyaml",
+      "installed_version": "1.30",
+      "path": "transitive via org.springframework.boot:spring-boot-starter",
+      "fixed_version": null,
+      "sla_days_remaining": 4,
+      "notes": "Constructor deserialization. Reachability not assessed. Severity lowered from critical and SLA kept non-negative so this reaches the agent path instead of being blocked before it."
+    },
+    {
+      "id": "F-40220",
+      "cve": "CVE-2015-6420",
+      "severity": "high",
+      "service": "inventory-api",
+      "package": "commons-collections:commons-collections",
+      "installed_version": "3.2.1",
+      "path": "direct",
+      "fixed_version": null,
+      "sla_days_remaining": 63,
+      "notes": "No patched release on the 3.x line. Successor artifact is commons-collections4, different package namespace. SLA kept non-negative so this reaches the agent path instead of manual review."
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+stacks:
+  java:
+    marker: pom.xml
+    dependencyFile: pom.xml
+    # What mvn writes. Change verification does not see these, because the harness now builds
+    # while it is still remediating; the agent-writes-into-build-output guard keeps the agent out.
+    buildOutput: [target]
+    steps:
+      - name: compile
+        command: mvn -q compile
+        onFailure: block
+      - name: test
+        command: mvn -q test
+        onFailure: block
+  python:
+    marker: pyproject.toml
+    dependencyFile: requirements.lock
+    buildOutput: [__pycache__, .pytest_cache, .tox, build, dist]
+    steps:
+      - name: install
+        command: pip install -r requirements.lock pytest
+        onFailure: block
+      - name: compile
+        command: python -m compileall -q .
+        onFailure: block
+      - name: test
+        command: pytest -q
+        onFailure: block

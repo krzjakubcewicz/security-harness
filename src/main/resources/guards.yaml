@@ -1,0 +1,23 @@
+# A guard that matches nothing means ALLOW - the opposite of autonomy.yaml, where a finding
+# nothing matches goes to a human.
+guards:
+  - name: manual-review-when-the-agent-writes-outside-the-service-source
+    when: tool
+    match:
+      pathSegment: [.git, .github, .mvn, settings.xml]
+    action: manual_review
+
+  - name: manual-review-when-the-agent-touches-a-secret-file
+    when: tool
+    match:
+      pathSegment: [.env, .env.local, .npmrc, .netrc, id_rsa, id_ed25519, credentials, .aws, .ssh]
+    action: manual_review
+
+  # Change verification cannot see inside a stack's declared buildOutput - that is what lets the
+  # harness build mid-run without every run failing on target/. This is the other half of that
+  # trade: the one place the agent could write unwatched is the one place it may not write.
+  - name: manual-review-when-the-agent-writes-into-build-output
+    when: tool
+    match:
+      pathSegment: [target, build, dist, out, __pycache__, .pytest_cache, .tox]
+    action: manual_review
